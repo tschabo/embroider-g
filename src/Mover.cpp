@@ -48,6 +48,12 @@ void Mover::moveTo(float x, float y, float speed)
     setSpeed(_stepperY, speed);
 }
 
+void Mover::setPosition(float x, float y)
+{
+    _stepperX.setCurrentPosition(static_cast<long>(x * _ticks_per_mm));
+    _stepperY.setCurrentPosition(static_cast<long>(y * _ticks_per_mm));
+}
+
 void Mover::enable()
 {
     _stepperX.enableOutputs();
@@ -60,7 +66,13 @@ void Mover::disable()
     _stepperY.disableOutputs();
 }
 
+bool Mover::isRunning()
+{
+    return _stepperX.isRunning() || _stepperY.isRunning();
+}
+
 void Mover::run()
 {
-    _stepperGroup.run();
+    if (isRunning())
+        _stepperGroup.run();
 }

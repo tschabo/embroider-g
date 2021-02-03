@@ -14,8 +14,14 @@ public:
     // mm and mm/s
     void moveTo(float x, float y, float speed);
 
+    // setting the current position ... wherever the hoop currently is
+    void setPosition(float x, float y);
+
+    // enable/disable Stepperdriver
     void enable();
     void disable();
+
+    bool isRunning(); // should be const, but the method in AccelStepper is not !
 
     // has to be called frequently ... fast !!!
     void run();

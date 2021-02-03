@@ -1,9 +1,21 @@
 #include <Arduino.h>
+#include <TimerOne.h>
+#include "Mover.h"
 
-void setup() {
-  // put your setup code here, to run once:
+Mover hoopMover;
+
+void move()
+{
+  hoopMover.run();
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void setup()
+{
+  Timer1.initialize(100);
+  Timer1.attachInterrupt(move);
+}
+
+void loop()
+{
+  
 }
