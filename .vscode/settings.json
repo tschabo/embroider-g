@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "char_traits": "cpp",
+        "list": "cpp",
+        "string": "cpp"
+    }
+}
