@@ -2,6 +2,7 @@
     "files.associations": {
         "char_traits": "cpp",
         "list": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "*.tpp": "cpp"
     }
 }

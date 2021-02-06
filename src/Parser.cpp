@@ -1,6 +1,6 @@
 #include "Parser.h"
 
-Parser::Parser(CircularUnibuff &buff) : _buffer(buff)
+Parser::Parser(ConfiguredRingbuffer &buff) : _buffer(buff)
 {
 }
 
@@ -10,7 +10,12 @@ void Parser::parseCommand(char command)
     {
     case 'm': //move
         _state = findX;
-        _currentCommandBuffer._[0] = command;
+        _currentCommandBuffer.command = command;
+        break;
+    case 'd': // disable steppers
+    case 'e': // enable steppers
+        _buffer.pushFront().command = command;
+        _state = findStart;
         break;
     }
 }
@@ -19,8 +24,7 @@ bool Parser::parseFloat(char floatPart, float &thePlaceToPut)
 {
     if (floatPart == ';')
     {
-        float &tmp = *reinterpret_cast<float *>(&_currentCommandBuffer._[1]);
-        tmp = atof(_scratch_buffer.data());
+        thePlaceToPut = atof(_scratch_buffer.data());
         _scratch_buffer.clear();
         return true; // the caller has to set the new State
     }
@@ -36,13 +40,13 @@ bool Parser::parseFloat(char floatPart, float &thePlaceToPut)
 
 bool Parser::push(char c)
 {
-    if(_buffer.isFull())
+    if (_buffer.isFull())
         return false;
-        
+
     switch (_state)
     {
     case findStart:
-        if(c != '>')
+        if (c != '>')
             break;
         _state = evalCommand;
         break;
@@ -50,16 +54,19 @@ bool Parser::push(char c)
         parseCommand(c);
         break;
     case findX:
-        if(parseFloat(c, *reinterpret_cast<float*>(&_currentCommandBuffer._[1])))
+        if (parseFloat(c, _currentCommandBuffer.var0))
             _state = findY;
         break;
     case findY:
-        if(parseFloat(c, *reinterpret_cast<float*>(&_currentCommandBuffer._[1+sizeof(float)])))
+        if (parseFloat(c, _currentCommandBuffer.var1))
             _state = findSpeed;
         break;
     case findSpeed:
-        if(parseFloat(c, *reinterpret_cast<float*>(&_currentCommandBuffer._[11+sizeof(float)+sizeof(float)])))
+        if (parseFloat(c, _currentCommandBuffer.var3))
+        {
+            _buffer.pushFront() = _currentCommandBuffer;
             _state = findStart;
+        }
         break;
     }
     return true;

@@ -1,24 +1,22 @@
 #pragma once
 
 #include <Array.h>
-#include <CircularBuffer.h>
+#include "RingBuffer.h"
 
-struct unibuff
-{
-    char _[sizeof(float) * 3 + 1]{};
-};
-using CircularUnibuff = CircularBuffer<unibuff, 10>;
+#define SINGLE_BUFFER_SIZE (1+sizeof(float)*3)
+
+using ConfiguredRingbuffer = RingBuffer<20>;
 
 class Parser
 {
 public:
-    Parser(CircularUnibuff &buff);
+    Parser(ConfiguredRingbuffer &buff);
 
     // feeding bytewise ... returns false if Buffer is full
     bool push(char c);
 
 private:
-    CircularUnibuff &_buffer;
+    ConfiguredRingbuffer &_buffer;
     enum
     {
         findStart,
@@ -28,7 +26,7 @@ private:
         findSpeed,
     } _state{findStart};
     Array<char, 50> _scratch_buffer{};
-    unibuff _currentCommandBuffer{};
+    Command _currentCommandBuffer{};
     void parseCommand(char command);
     bool parseFloat(char floatPart, float &thePlaceToPut); // returns true if finished parsing
 };
