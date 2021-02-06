@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include "stdlib.h"
 
 Parser::Parser(ConfiguredRingbuffer &buff) : _buffer(buff)
 {

@@ -1,6 +1,5 @@
 #pragma once
 #include <stdint.h>
-#include <Array.h>
 
 struct Command{
     char command{};

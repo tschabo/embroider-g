@@ -12,8 +12,6 @@ void setup()
   Serial.begin(115200);
 }
 
-char currentInput{-1};
-
 void loop()
 {
   if (!g_buffer.isFull() && Serial.available())
