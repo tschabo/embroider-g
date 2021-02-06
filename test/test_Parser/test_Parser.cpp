@@ -6,11 +6,11 @@ Parser p(buff);
 
 void test_in_out()
 {
-    auto l1 = ">m0.0;10.111111;200;";
-    for (int i = 0; i < sizeof(l1); i++)
+    char l1[] = ">m0.0;10.111111;200;";
+    for (int i = 0; i < sizeof(l1)-1; i++)
     {
         p.push(l1[i]);
-        if (i == sizeof(l1) - 1)
+        if (i == sizeof(l1) - 2)
         {
             TEST_ASSERT(!buff.isEmpty());
         }
@@ -19,6 +19,11 @@ void test_in_out()
             TEST_ASSERT(buff.isEmpty());
         }
     }
+    auto b = buff.popBack();
+    TEST_ASSERT_EQUAL(b.command, 'm');
+    TEST_ASSERT_EQUAL(b.var0, 0.0);
+    TEST_ASSERT_EQUAL(b.var1, 10.111111);
+    TEST_ASSERT_EQUAL(b.var3, 200.0);    
 }
 
 int main()

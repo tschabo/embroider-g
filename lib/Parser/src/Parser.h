@@ -18,6 +18,9 @@ public:
 
     void clear()
     {
+        for(int i = 0; i < SIZE; i++){
+            _buffer[i] = 0;
+        }
         _size = 0;
     }
 
