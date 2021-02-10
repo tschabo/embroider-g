@@ -1,7 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include <AccelStepper.h>
-#include <MultiStepper.h>
+#include <SimpleStepper.h>
 
 // convinience class for hoop positioning
 // ... no acceleration needed? just move as fast as possible to toe next position
@@ -21,14 +20,13 @@ public:
     void enable();
     void disable();
 
-    bool isRunning(); // should be const, but the method in AccelStepper is not !
+    bool isRunning() const;
 
     // has to be called frequently ... fast !!!
     void run();
 
 private:
-    AccelStepper _stepperX;
-    AccelStepper _stepperY;
-    MultiStepper _stepperGroup;
-    uint16_t _ticks_per_mm = 100; // GT2 2mm + 16 teeth pulley + 1/16 microstepping
+    SimpleStepper _stepperX;
+    SimpleStepper _stepperY;
+    const uint16_t _ticks_per_mm = 100; // GT2 2mm + 16 teeth pulley + 1/16 microstepping
 };

@@ -1,22 +1,26 @@
 #include "Parser.h"
 #include "stdlib.h"
 
-Parser::Parser(ConfiguredRingbuffer &buff) : _buffer(buff)
+Parser::Parser()
 {
 }
 
 void Parser::parseCommand(char command)
 {
-    switch (command)
+    auto c = static_cast<decltype(Command().command)>(command);
+    switch (c)
     {
-    case 'm': //move
+    case Command::move:
         _state = findX;
-        _currentCommandBuffer.command = command;
+        _currentCommandBuffer.command = c;
         break;
     case 'd': // disable steppers
     case 'e': // enable steppers
-        _buffer.pushFront().command = command;
+        _currentCommandBuffer.command = c;
+        _finished = true;
         _state = findStart;
+        break;
+    default:
         break;
     }
 }
@@ -39,16 +43,15 @@ bool Parser::parseFloat(char floatPart, float &thePlaceToPut)
     return false;
 }
 
-bool Parser::push(char c)
+Command *Parser::push(char c)
 {
-    if (_buffer.isFull())
-        return false;
-
+    _finished = false;
     switch (_state)
     {
     case findStart:
         if (c != '>')
             break;
+        _currentCommandBuffer = {};
         _state = evalCommand;
         break;
     case evalCommand:
@@ -65,10 +68,11 @@ bool Parser::push(char c)
     case findSpeed:
         if (parseFloat(c, _currentCommandBuffer.var3))
         {
-            _buffer.pushFront() = _currentCommandBuffer;
+            _finished = true;
             _state = findStart;
         }
         break;
     }
-    return true;
+
+    return _finished ? &_currentCommandBuffer : nullptr;
 }

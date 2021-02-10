@@ -1,12 +1,24 @@
 #pragma once
+#include <Arduino.h>
 
-#include "RingBuffer.h"
+struct Command
+{
+    enum
+    {
+        none = 0,
+        move = 'm',
+        enable_steppers = 'e',
+        disable_steppers = 'd',
+    } command{none};
+    float var0{};
+    float var1{};
+    float var3 {};
+};
 
 template <uint8_t SIZE>
-class MyBuffer
+class CBuffer
 {
 public:
-
     bool push_back(char c)
     {
         if (full())
@@ -18,7 +30,8 @@ public:
 
     void clear()
     {
-        for(int i = 0; i < SIZE; i++){
+        for (int i = 0; i < SIZE; i++)
+        {
             _buffer[i] = 0;
         }
         _size = 0;
@@ -40,24 +53,19 @@ public:
     }
 
 private:
-    char _buffer[SIZE];
+    char _buffer[SIZE]{};
     uint8_t _size{};
 };
-
-#define SINGLE_BUFFER_SIZE (1 + sizeof(float) * 3)
-
-using ConfiguredRingbuffer = RingBuffer<20>;
 
 class Parser
 {
 public:
-    Parser(ConfiguredRingbuffer &buff);
+    Parser();
 
-    // feeding bytewise ... returns false if Buffer is full
-    bool push(char c);
+    // feeding bytewise ... returns Command if the Parser found a complete Command otherwise nullptr
+    Command* push(char c);
 
 private:
-    ConfiguredRingbuffer &_buffer;
     enum
     {
         findStart,
@@ -66,8 +74,10 @@ private:
         findY,
         findSpeed,
     } _state{findStart};
-    MyBuffer<50> _scratch_buffer{};
+
+    CBuffer<50> _scratch_buffer{};
     Command _currentCommandBuffer{};
     void parseCommand(char command);
     bool parseFloat(char floatPart, float &thePlaceToPut); // returns true if finished parsing
+    bool _finished{false};
 };
