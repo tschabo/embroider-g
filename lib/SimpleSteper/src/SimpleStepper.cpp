@@ -32,7 +32,7 @@ uint16_t SimpleStepper::stepsToGo() const
 
 void SimpleStepper::moveAbs(float pos)
 {
-    uint16_t posInStepsFromZero{(pos * (float)_stepsPerM) / 1000.0};
+    int32_t posInStepsFromZero{(pos * (float)_stepsPerM) / 1000.0};
     if (posInStepsFromZero > _position)
     {
         _stepsToGo = posInStepsFromZero - _position;
@@ -47,14 +47,13 @@ void SimpleStepper::moveAbs(float pos)
     {
         _stepsToGo = 0;
     }
+    digitalWrite(_dirPin, (_direction == direction::pos) ? HIGH : LOW);
 }
 
 void SimpleStepper::setSpeed(float speed)
 {
     _speed = (speed * (float)_stepsPerM) / 1000; // ticks/sec
     _stepInterval = 1000000 / _speed;
-    Serial.print("_stepInterval: ");
-    Serial.println(_stepInterval);
 }
 
 void SimpleStepper::setPosition(float pos)

@@ -40,16 +40,16 @@ public:
     /// \returns false if the buffer is full
     bool push(char c)
     {
-        #ifdef ECHO_ON
-        Serial.print(c);
-        #endif
         if(isFull())
             return false;
         auto* command = _parser.push(c);
         if(!command)
             return true;
         _buffer[_currentBufferIdx++] = *command;
+        if(_currentBufferIdx == COMMAND_COUNT)
+            _currentBufferIdx = 0;
         ++_size;
+        Serial.write("<");// ack
         return true;
     }
 
@@ -65,6 +65,11 @@ public:
             idx = COMMAND_COUNT + idx;
         --_size;
         return _buffer[idx];
+    }
+
+    uint8_t size() const
+    {
+        return _size;
     }
 
 private:

@@ -30,7 +30,7 @@ private:
     const uint16_t _stepsPerM;
 
     // internal we calculate everything in steps
-    uint16_t _position{};
+    int32_t _position{};
     uint16_t _stepsToGo{};
     uint16_t _speed{};
     enum class direction{
