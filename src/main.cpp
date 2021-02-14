@@ -13,20 +13,30 @@ void setup()
 
 bool wait = false;
 
+bool isCommandComplete{};
+
 void loop()
 {
-  if (!g_commandBuffer.isFull() && Serial.available())
-    g_commandBuffer.push(Serial.read());
+  isCommandComplete = false;
+  if (Serial.available() && !g_commandBuffer.isFull())
+    isCommandComplete = g_commandBuffer.push(Serial.read());
 
   if (g_commandBuffer.isFull() && !wait)
   {
+    // this is the case, when a command has completed and the buffer got full
     Serial.print("!"); // signal buffer full
     wait = true;
   }
-  else if(!g_commandBuffer.isFull() && wait && !Serial.available())
+  else if (!g_commandBuffer.isFull() && wait && !Serial.available())
   {
+    // this is the case when the buffer was previosly full and the caller is waiting for sending more data.
+    // but before we let the caller send more data ... read the pending data (if any) from the serial buffer.
     Serial.print("+"); // signal there is space left
     wait = false;
+  }
+  else if (isCommandComplete)
+  {
+    Serial.print(">"); // normal ACK
   }
 
   if (!g_hoopMover.isRunning() && !g_commandBuffer.isEmpty())

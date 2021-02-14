@@ -37,19 +37,18 @@ public:
     }
 
     /// \brief Push the commands as string, but char by char ... keep everything reactive!
-    /// \returns false if the buffer is full
+    /// \returns true if a command was completely received
+    /// \remarks the caller has to take care about a full CommandBuffer ... see isFull(),
+    ///          otherwise commands get overridden!
     bool push(char c)
     {
-        if(isFull())
-            return false;
         auto* command = _parser.push(c);
         if(!command)
-            return true;
+            return false;
         _buffer[_currentBufferIdx++] = *command;
         if(_currentBufferIdx == COMMAND_COUNT)
             _currentBufferIdx = 0;
         ++_size;
-        Serial.write("<");// ack
         return true;
     }
 
