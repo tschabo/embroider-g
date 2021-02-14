@@ -10,7 +10,7 @@ public:
     SimpleStepper(int enablePin,
                   int dirPin,
                   int stepPin,
-                  uint16_t stepsPerMm);
+                  uint32_t stepsPerM);
 
     void enable() const;
     void disable() const;
@@ -19,7 +19,7 @@ public:
     void setSpeed(float speed);
     void setPosition(float pos);
 
-    uint16_t stepsToGo() const;
+    uint32_t stepsToGo() const;
 
     void run();
 
@@ -27,12 +27,12 @@ private:
     const int _enablePin;
     const int _dirPin;
     const int _stepPin;
-    const uint16_t _stepsPerM;
+    const uint32_t _stepsPerM;
 
     // internal we calculate everything in steps
-    int32_t _position{};
-    uint16_t _stepsToGo{};
-    uint16_t _speed{};
+    int64_t _position{};
+    uint32_t _stepsToGo{};
+    uint32_t _speed{};
     enum class direction{
         pos,
         neg,

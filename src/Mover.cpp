@@ -21,8 +21,8 @@
 #define STEPPER2_ENABLE_PIN 8
 #endif
 
-Mover::Mover() : _stepperX(SimpleStepper(STEPPER1_ENABLE_PIN, STEPPER1_DIR_PIN, STEPPER1_STEP_PIN, 3125*16)),
-                 _stepperY(SimpleStepper(STEPPER2_ENABLE_PIN, STEPPER2_DIR_PIN, STEPPER2_STEP_PIN, 3125*16))
+Mover::Mover() : _stepperX(SimpleStepper(STEPPER1_ENABLE_PIN, STEPPER1_DIR_PIN, STEPPER1_STEP_PIN, 50000)),
+                 _stepperY(SimpleStepper(STEPPER2_ENABLE_PIN, STEPPER2_DIR_PIN, STEPPER2_STEP_PIN, 50000))
 {
     _stepperX.disable();
     _stepperY.disable();

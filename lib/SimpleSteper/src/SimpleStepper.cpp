@@ -3,10 +3,10 @@
 SimpleStepper::SimpleStepper(int enablePin,
                              int dirPin,
                              int stepPin,
-                             uint16_t stepsPerMm) : _enablePin(enablePin),
+                             uint32_t stepsPerM) : _enablePin(enablePin),
                                                     _dirPin(dirPin),
                                                     _stepPin(stepPin),
-                                                    _stepsPerM(stepsPerMm)
+                                                    _stepsPerM(stepsPerM)
 {
     pinMode(_enablePin, OUTPUT);
     digitalWrite(_enablePin, HIGH); // disable is default
@@ -25,7 +25,7 @@ void SimpleStepper::disable() const
     digitalWrite(_enablePin, HIGH);
 }
 
-uint16_t SimpleStepper::stepsToGo() const
+uint32_t SimpleStepper::stepsToGo() const
 {
     return _stepsToGo;
 }

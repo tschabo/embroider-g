@@ -28,5 +28,4 @@ public:
 private:
     SimpleStepper _stepperX;
     SimpleStepper _stepperY;
-    const uint16_t _ticks_per_mm = 100; // GT2 2mm + 16 teeth pulley + 1/16 microstepping
 };
