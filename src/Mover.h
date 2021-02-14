@@ -3,7 +3,7 @@
 #include <SimpleStepper.h>
 
 // convinience class for hoop positioning
-// ... no acceleration needed? just move as fast as possible to toe next position
+// ... no acceleration needed?! just move as fast as possible to the next position
 // 
 class Mover
 {
