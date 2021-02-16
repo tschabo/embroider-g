@@ -25,6 +25,7 @@ void Parser::parseCommand(char command)
     }
 }
 
+
 bool Parser::parseFloat(char floatPart, float &thePlaceToPut)
 {
     if (floatPart == ';')
@@ -40,6 +41,24 @@ bool Parser::parseFloat(char floatPart, float &thePlaceToPut)
         return false;
     }
     _scratch_buffer.push_back(floatPart);
+    return false;
+}
+
+bool Parser::parseUInt(char uintPart, uint32_t &thePlaceToPut)
+{
+    if (uintPart == ';')
+    {
+        thePlaceToPut = strtoul(_scratch_buffer.data(), nullptr, 10);
+        _scratch_buffer.clear();
+        return true; // the caller has to set the new State
+    }
+    if (_scratch_buffer.full() || uintPart < '0' || uintPart > '9')
+    {
+        _state = findStart;
+        _scratch_buffer.clear();
+        return false;
+    }
+    _scratch_buffer.push_back(uintPart);
     return false;
 }
 
@@ -63,10 +82,14 @@ Command *Parser::push(char c)
         break;
     case findY:
         if (parseFloat(c, _currentCommandBuffer.var1))
+            _state = findMachineTicks;
+        break;
+    case findMachineTicks:
+        if(parseUInt(c, _currentCommandBuffer.var3))
             _state = findSpeed;
         break;
     case findSpeed:
-        if (parseFloat(c, _currentCommandBuffer.var3))
+        if (parseFloat(c, _currentCommandBuffer.var4))
         {
             _finished = true;
             _state = findStart;

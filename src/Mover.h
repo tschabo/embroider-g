@@ -11,7 +11,7 @@ public:
     Mover();
 
     // mm and mm/s
-    void moveTo(float x, float y, float speed);
+    void moveTo(float x, float y, uint32_t stepsMachine, float speed);
 
     // setting the current position ... wherever the hoop currently is
     void setPosition(float x, float y);
@@ -28,4 +28,5 @@ public:
 private:
     SimpleStepper _stepperX;
     SimpleStepper _stepperY;
+    SimpleStepper _machineMotor;
 };

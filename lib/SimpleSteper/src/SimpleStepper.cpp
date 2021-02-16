@@ -50,6 +50,12 @@ void SimpleStepper::moveAbs(float pos)
     digitalWrite(_dirPin, (_direction == direction::pos) ? HIGH : LOW);
 }
 
+void SimpleStepper::moveSteps(uint32_t steps, direction dir){
+    _position=0;
+    _direction = dir;
+    _stepsToGo = steps;
+}
+
 void SimpleStepper::setSpeed(float speed)
 {
     _speed = (speed * (float)_stepsPerM) / 1000; // ticks/sec

@@ -1,60 +1,65 @@
 #include "Mover.h"
 
 #ifdef __AVR_ATmega1284P__
-// The X Stepper pins
-#define STEPPER1_DIR_PIN 21
-#define STEPPER1_STEP_PIN 15
-#define STEPPER1_ENABLE_PIN 14
-// The Y stepper pins
-#define STEPPER2_DIR_PIN 23
-#define STEPPER2_STEP_PIN 22
-#define STEPPER2_ENABLE_PIN 14
-#else 
+#define STEPPER_X_DIR_PIN 21
+#define STEPPER_X_STEP_PIN 15
+#define STEPPER_X_ENABLE_PIN 14
+
+#define STEPPER_Y_DIR_PIN 23
+#define STEPPER_Y_STEP_PIN 22
+#define STEPPER_Y_ENABLE_PIN 14
+#else
 // nano cnc shield
-// The X Stepper pins
-#define STEPPER1_DIR_PIN 4
-#define STEPPER1_STEP_PIN 7
-#define STEPPER1_ENABLE_PIN 8
-// The Y stepper pins
-#define STEPPER2_DIR_PIN 3
-#define STEPPER2_STEP_PIN 6
-#define STEPPER2_ENABLE_PIN 8
+#define STEPPER_X_DIR_PIN 2
+#define STEPPER_X_STEP_PIN 5
+#define STEPPER_X_ENABLE_PIN 8
+
+#define STEPPER_Y_DIR_PIN 3
+#define STEPPER_Y_STEP_PIN 6
+#define STEPPER_Y_ENABLE_PIN 8
+
+#define STEPPER_MACHINE_DIR_PIN 4
+#define STEPPER_MACHINE_STEP_PIN 7
+#define STEPPER_MACHINE_ENABLE_PIN 8
 #endif
 
-Mover::Mover() : _stepperX(SimpleStepper(STEPPER1_ENABLE_PIN, STEPPER1_DIR_PIN, STEPPER1_STEP_PIN, 50000)),
-                 _stepperY(SimpleStepper(STEPPER2_ENABLE_PIN, STEPPER2_DIR_PIN, STEPPER2_STEP_PIN, 50000))
+Mover::Mover() : _stepperX(SimpleStepper(STEPPER_X_ENABLE_PIN, STEPPER_X_DIR_PIN, STEPPER_X_STEP_PIN, 50000)),
+                 _stepperY(SimpleStepper(STEPPER_Y_ENABLE_PIN, STEPPER_Y_DIR_PIN, STEPPER_Y_STEP_PIN, 50000)),
+                 _machineMotor(SimpleStepper(STEPPER_MACHINE_ENABLE_PIN, STEPPER_MACHINE_DIR_PIN, STEPPER_MACHINE_STEP_PIN, 50000))
 {
     _stepperX.disable();
     _stepperY.disable();
+    _machineMotor.disable();
 }
 
-void Mover::moveTo(float x, float y, float speed)
+void Mover::moveTo(float x, float y, uint32_t stepsMachine, float speed)
 {
     // coreXY
-    auto x_ = (x-y)*2;
-    auto y_ = (x+y)*2;
+    auto x_ = (x - y) * 2;
+    auto y_ = (x + y) * 2;
     _stepperX.moveAbs(x_);
     _stepperY.moveAbs(y_);
-    const float stepsX = _stepperX.stepsToGo();
-    const float stepsY = _stepperY.stepsToGo();
+    _machineMotor.moveSteps(stepsMachine, SimpleStepper::direction::neg);
     float speedX{};
     float speedY{};
-    if(stepsX > stepsY)
+    float speedMachine{};
+
+    SimpleStepper *steppers[]{&_machineMotor, &_stepperX, &_stepperY};
+
+    auto mostSteps = steppers[0];
+    for (uint8_t c = 1; c < sizeof(steppers) / sizeof(SimpleStepper *); c++)
     {
-        speedX = speed;
-        speedY = stepsY / stepsX * speed;
+        if (steppers[c]->stepsToGo() > mostSteps->stepsToGo())
+            mostSteps = steppers[c];
     }
-    else if(stepsY > stepsX)
+    mostSteps->setSpeed(speed);
+    for (uint8_t c = 0; c < sizeof(steppers) / sizeof(SimpleStepper *); c++)
     {
-        speedY = speed;
-        speedX = stepsX / stepsY * speed;
+        auto current = steppers[c];
+        if (current == mostSteps)
+            continue;
+        current->setSpeed((float)current->stepsToGo() / (float)mostSteps->stepsToGo() * speed);
     }
-    else
-    {
-        speedY = speedX = speed;
-    }
-    _stepperX.setSpeed(speedX);
-    _stepperY.setSpeed(speedY);
 }
 
 void Mover::setPosition(float x, float y)
@@ -67,24 +72,27 @@ void Mover::enable()
 {
     _stepperX.enable();
     _stepperY.enable();
+    _machineMotor.enable();
 }
 
 void Mover::disable()
 {
     _stepperX.disable();
     _stepperY.disable();
+    _machineMotor.disable();
 }
 
 bool Mover::isRunning() const
 {
-    return _stepperX.stepsToGo() != 0 || _stepperY.stepsToGo() != 0;
+    return _stepperX.stepsToGo() != 0 || _stepperY.stepsToGo() != 0 || _machineMotor.stepsToGo() != 0;
 }
 
 void Mover::run()
 {
-    if(!isRunning())
+    if (!isRunning())
         return;
-        
+
     _stepperX.run();
     _stepperY.run();
+    _machineMotor.run();
 }

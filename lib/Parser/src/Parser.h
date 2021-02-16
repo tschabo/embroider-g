@@ -12,7 +12,8 @@ struct Command
     } command{none};
     float var0{};
     float var1{};
-    float var3 {};
+    uint32_t var3{};
+    float var4 {};
 };
 
 template <uint8_t SIZE>
@@ -72,6 +73,7 @@ private:
         evalCommand,
         findX,
         findY,
+        findMachineTicks,
         findSpeed,
     } _state{findStart};
 
@@ -79,5 +81,6 @@ private:
     Command _currentCommandBuffer{};
     void parseCommand(char command);
     bool parseFloat(char floatPart, float &thePlaceToPut); // returns true if finished parsing
+    bool parseUInt(char uintPart, uint32_t &thePlaceToPut); // returns true if finished parsing
     bool _finished{false};
 };

@@ -12,10 +12,17 @@ public:
                   int stepPin,
                   uint32_t stepsPerM);
 
+    enum class direction
+    {
+        pos,
+        neg,
+    };
+
     void enable() const;
     void disable() const;
 
     void moveAbs(float pos);
+    void moveSteps(uint32_t steps, direction dir);
     void setSpeed(float speed);
     void setPosition(float pos);
 
@@ -33,10 +40,7 @@ private:
     int64_t _position{};
     uint32_t _stepsToGo{};
     uint32_t _speed{};
-    enum class direction{
-        pos,
-        neg,
-    } _direction{direction::pos};
+    direction _direction{direction::pos};
 
     // time is in micro seconds
     unsigned long _stepInterval{};

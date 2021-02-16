@@ -45,7 +45,7 @@ void loop()
     switch (command.command)
     {
     case Command::move:
-      g_hoopMover.moveTo(command.var0, command.var1, command.var3);
+      g_hoopMover.moveTo(command.var0, command.var1, command.var3, command.var4);
       break;
     case Command::disable_steppers:
       g_hoopMover.disable();
