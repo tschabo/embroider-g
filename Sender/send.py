@@ -2,8 +2,9 @@ import serial
 import pyembroidery
 import time
 
+
 def sendOne(ser, s, mot):
-    cmmd = ">m{};{};{};500.0;".format(s[0]/10, -s[1]/10, int(mot))
+    cmmd = ">m{};{};{};1000.0;".format(s[0]/10, -s[1]/10, int(mot))
     print(cmmd)
     ser.write(cmmd.encode())
     ser.flush()
@@ -38,7 +39,9 @@ while bytes_to_read < 1:
     time.sleep(0.05)
     bytes_to_read = ser.inWaiting()
 print(ser.read())
-pattern=pyembroidery.read_pes("./samples011214-07.pes")
+pattern = pyembroidery.read_pes("./samples011214-07.pes")
 for s in pattern.stitches:
-    sendOne(ser, s, ((200/4)*16))
-    sendOne(ser, s, ((200/4)*16*3))
+    #sendOne(ser, s, (200/4))
+    #sendOne(ser, s, ((200/4)*3))
+    sendOne(ser, s, ((200/4)*16*(58/16)))
+    sendOne(ser, s, ((200/4)*16*(58/16)*3))
